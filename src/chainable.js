@@ -134,7 +134,7 @@ function proxifyChainlink(chainlink, makeChildlink) {
  * @returns {Proxy} The chainable's proxy object.
  * @export
  */
-export function chainableGenerator(settings = {}) {
+export default function chainableGenerator(settings = {}) {
   const options = _.isString(settings) ? { prefix: settings } : settings;
   return proxifyChainlink(makeChainlink(options, chainableGenerator), chainableGenerator);
 }
@@ -148,7 +148,3 @@ export function chainableGenerator(settings = {}) {
 export function chainableGeneratorWithDefaults(defaults = {}) {
   return settings => chainableGenerator(_.defaults(settings, defaults));
 }
-
-// Creates the default chainable creation function
-// that takes in options and returns a chainable proxy.
-export default _.partial(chainableGenerator, _, chainableGenerator);
