@@ -1,0 +1,64 @@
+{
+  "name": "@jasonpollman/chainable",
+  "version": "1.0.0",
+  "description": "The base for creating other chainable (Proxy) libraries.",
+  "license": "ISC",
+  "main": "index.js",
+  "keywords": [
+    "chainable"
+  ],
+  "author": {
+    "name": "Jason James Pollman",
+    "email": "jasonjpollman@gmail.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/JasonPollman/chainable.git"
+  },
+  "scripts": {
+    "lint": "npx eslint ./src",
+    "test": "NODE_ENV=test mocha ./test",
+    "test:cover": "NODE_ENV=test nyc mocha",
+    "compile:node": "NODE_ENV=production npx babel ./src/chainable.js -o ./dist/chainable.js",
+    "compile": "rm -rf ./dist && mkdir ./dist && npm run compile:node",
+    "prepublish": "npm run compile"
+  },
+  "dependencies": {
+    "lodash": "^4.17.10"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.3",
+    "babel-plugin-istanbul": "^4.1.6",
+    "babel-plugin-lodash": "^3.3.2",
+    "babel-plugin-transform-es2015-modules-umd": "^6.24.1",
+    "babel-plugin-transform-runtime": "^6.23.0",
+    "babel-preset-env": "^1.6.1",
+    "babel-preset-minify": "^0.4.1",
+    "babel-preset-stage-0": "^6.24.1",
+    "babel-register": "^6.26.0",
+    "babel-runtime": "^6.26.0",
+    "chai": "^4.1.2",
+    "eslint": "^4.19.1",
+    "eslint-config-airbnb": "^16.1.0",
+    "eslint-plugin-import": "^2.11.0",
+    "eslint-plugin-jsx-a11y": "^6.0.3",
+    "eslint-plugin-react": "^7.7.0",
+    "mocha": "^5.1.1",
+    "nyc": "^11.7.2",
+    "sinon": "^5.0.7"
+  },
+  "nyc": {
+    "sourceMap": false,
+    "instrument": false,
+    "check-coverage": true,
+    "lines": 99,
+    "statements": 99,
+    "functions": 99,
+    "branches": 99,
+    "reporter": [
+      "lcov",
+      "text-summary"
+    ]
+  }
+}
