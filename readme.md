@@ -125,10 +125,11 @@ const chainable = Chainable({ /* options */ });
 | -------------------- | ---------------------- | ------------ | ----------- |
 | prefix               | string\|function\|null | `null`       | A string to prepend to the chainable's `toString` result. |
 | suffix               | string\|function\|null | `null`       | A string to append to the chainable's `toString` result. |
-| sanitize             | function               | `_.identity` | A function used to sanitize each tokens before converting it to string. |
+| sanitize             | function               | `_.identity` | A function that provides an opportunity to sanitize the `toString` result on all links are joined. |
+| sanitizeLinks        | function               | `_.identity` | A function used to sanitize each link's tokens before converting it to string. |
 | separator            | string\|function       | `.`          | The "glue" to use when all of the chainable's tokens are joined. |
-| functionalChainlinks | boolean                | `false`      | If `true` chainable links will be functions, not objects and can invoked. |
-| handleLinkInvocation | function               | `_.noop`     | The function that's called when a chainable is invoked, only applies when `functionalChainlinks` is true |
+| invocableLinks       | boolean                | `false`      | If `true` chainable links will be functions, not objects and can invoked. |
+| handleLinkInvocation | function               | `_.noop`     | The function that's called when a chainable is invoked, only applies when `invocableLinks` is true |
 
 ### `chainableGeneratorWithDefaults({Object} defaults) => {function}`
 Creates a new chainable generator with the supplied defaults. That is, a function that will

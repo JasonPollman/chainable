@@ -12,6 +12,7 @@ const defaultChainlinkOptions = {
   suffix: null,
   sanitize: _.identity,
   separator: '.',
+  sanitizeLinks: _.identity,
   handleLinkInvocation: _.noop,
 };
 
@@ -43,64 +44,54 @@ const functionalizeChainlinkOptions = fp.compose(
 );
 
 /**
- * Gets the string representation of a chainlink.
+ * Creates a function that gets the string representation of a chainlink.
  * @returns {string} This chainlink's string value.
  */
-function chainlinkToString() {
-  const {
-    prefix,
-    suffix,
-    sanitize,
-    separator,
-  } = this;
+function chainlinkToString(properties) {
+  return () => {
+    const {
+      tokens,
+      prefix,
+      suffix,
+      sanitize,
+      separator,
+      sanitizeLinks,
+    } = properties;
 
-  const expanded = [prefix(this), ...this.tokens.map(sanitize), suffix(this)];
-  return removeNilValues(expanded).join(separator(this));
-}
-
-/**
- * Creates a method that's called when the associated chainlink is invoked.
- * @param {Object} properties The chainlink's property set.
- * @returns {function} The chainlink's invocable base.
- */
-function handleChainlinkInvocation(properties) {
-  return function chainlink() {
-    this.handleLinkInvocation.call(this, { ...properties });
-    return this;
+    const expanded = [prefix(properties), ...tokens.map(sanitizeLinks), suffix(properties)];
+    return sanitize(removeNilValues(expanded).join(separator(properties)));
   };
 }
 
 /**
  * Creates a new chainlink.
  * @param {Object} options Chainlink creation options.
+ * @param {function} makeChildlink A function to create a childlinks.
  * @returns {Object|function} The new chainlink.
  */
-function makeChainlink({
-  tokens = [],
-  functionalChainlinks = false,
-  ...options
-} = {}) {
+function makeChainlink({ tokens = [], ...options }, makeChildlink) {
   const chainlinkOptionsWithDefaults = _.defaults(options, defaultChainlinkOptions);
 
-  // The set of properties the chainlink will contain.
-  // The "base" of the chainlink can be either an object or function
-  // if `functionalChainlinks` is true, chainlinks will be functions
-  // and will be callable (left up the the user to implement).
   const properties = {
     property: null,
-
     ...chainlinkOptionsWithDefaults,
     ...functionalizeChainlinkOptions(chainlinkOptionsWithDefaults),
-
-    tokens,
-    toString: chainlinkToString,
-
     // Intentional: to prevent node from borking out when using a function
     // as a base and attempting to util.inspect or console.log the function.
     inspect: undefined,
+    tokens,
   };
 
-  const base = functionalChainlinks ? handleChainlinkInvocation(properties) : {};
+  Object.assign(properties, { toString: chainlinkToString({ ...properties }) });
+
+  // The "base" of the chainlink can be either an object or function
+  // if `functionalChainlinks` is true, chainlinks will be functions
+  // and will be callable (left up the the user to implement).
+  const base = !options.invocableLinks ? {} : function chainlink() {
+    properties.handleLinkInvocation({ ...properties });
+    return makeChildlink(base);
+  };
+
   return Object.assign(base, properties);
 }
 
@@ -143,9 +134,9 @@ function proxifyChainlink(chainlink, makeChildlink) {
  * @returns {Proxy} The chainable's proxy object.
  * @export
  */
-export function chainableGenerator(settings = {}, childlinkGenerator = chainableGenerator) {
+export function chainableGenerator(settings = {}) {
   const options = _.isString(settings) ? { prefix: settings } : settings;
-  return proxifyChainlink(makeChainlink(options), childlinkGenerator);
+  return proxifyChainlink(makeChainlink(options, chainableGenerator), chainableGenerator);
 }
 
 /**
@@ -155,8 +146,7 @@ export function chainableGenerator(settings = {}, childlinkGenerator = chainable
  * the supplied defaults mixed in with the options provided to the function.
  */
 export function chainableGeneratorWithDefaults(defaults = {}) {
-  const childlinkGenerator = chainableGeneratorWithDefaults(defaults);
-  return settings => chainableGenerator(_.defaults(settings, defaults), childlinkGenerator);
+  return settings => chainableGenerator(_.defaults(settings, defaults));
 }
 
 // Creates the default chainable creation function
