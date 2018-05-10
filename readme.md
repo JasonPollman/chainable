@@ -120,6 +120,7 @@ const chainable = Chainable({ /* options */ });
 ```
 
 **Options:**
+
 | Property             | Type                   | Default      | Description |
 | -------------------- | ---------------------- | ------------ | ----------- |
 | prefix               | string\|function\|null | `null`       | A string to prepend to the chainable's `toString` result. |
@@ -130,7 +131,7 @@ const chainable = Chainable({ /* options */ });
 | handleLinkInvocation | function               | `_.noop`     | The function that's called when a chainable is invoked, only applies when `functionalChainlinks` is true |
 
 ### `chainableGeneratorWithDefaults({Object} defaults) => {function}`
-Creates a new chainable generator with the supplied defaults. That is a function will will
+Creates a new chainable generator with the supplied defaults. That is, a function that will
 combine the given `defaults` with the options provided to the returned function. This is intended
 for creating libraries. Using the example above (an api), we can export an api but not specify
 the "host" (prefix):
@@ -155,10 +156,10 @@ export default (host) => {
 
 ## Limitations
 **This module requires native `Proxy`. A polyfill won't work!**   
-Since properties must exist on an object in order from them to be intercepted replicating
-the functionality using purely JavaScript is (AFAIK) impossible.
+Since properties must exist on an object in order for them to be intercepted, replicating
+this functionality using purely JavaScript is (AFAIK) impossible.
 
 *Therefore...*
 
-For now, `chainables` are basically limited to Node 6+ and will work in Chrome or Firefox.
+For now, `chainables` are limited to Node 6+ and will work in Chrome/Firefox.
 But hey, if you don't care about IE, go for it.

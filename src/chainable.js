@@ -81,7 +81,7 @@ function makeChainlink({
   tokens = [],
   functionalChainlinks = false,
   ...options
-}) {
+} = {}) {
   const chainlinkOptionsWithDefaults = _.defaults(options, defaultChainlinkOptions);
 
   // The set of properties the chainlink will contain.
@@ -145,7 +145,7 @@ function proxifyChainlink(chainlink, makeChildlink) {
  * @returns {Proxy} The chainable's proxy object.
  * @export
  */
-export function chainableGenerator(settings, childlinkGenerator = chainableGenerator) {
+export function chainableGenerator(settings = {}, childlinkGenerator = chainableGenerator) {
   const options = _.isString(settings) ? { prefix: settings } : settings;
   return proxifyChainlink(makeChainlink(options), childlinkGenerator);
 }
@@ -154,7 +154,7 @@ export function chainableGenerator(settings, childlinkGenerator = chainableGener
  * Creates a function that will create chainable objects
  * @param {Object} defaults The default options for this chainable object.
  */
-export const chainableGeneratorWithDefaults = (defaults) => {
+export const chainableGeneratorWithDefaults = (defaults = {}) => {
   const childlinkGenerator = chainableGeneratorWithDefaults(defaults);
   return settings => chainableGenerator(_.defaults(settings, defaults), childlinkGenerator);
 };
