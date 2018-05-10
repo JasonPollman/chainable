@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import sinon from 'sinon';
 import { expect } from 'chai';
 import chainable, { chainableGeneratorWithDefaults } from '../src/chainable';
 
@@ -295,6 +296,29 @@ describe('chainable', () => {
 
       expect(promise.then).to.be.a('function');
       expect(await promise).to.equal('world!');
+    });
+  });
+
+  describe('Examples', () => {
+    it('Should work as expected', () => {
+      const stub = sinon.stub(console, 'log');
+
+      const instance = chainable({
+        invocableLinks: true,
+        handleLinkInvocation: (properties, value) => {
+          // eslint-disable-next-line no-console
+          console.log(`Property ${properties.property} invoked with ${value}!`);
+        },
+      });
+
+      try {
+        expect(instance.foo(1).bar(2).baz(3).toString()).to.equal('foo.bar.baz');
+        expect(stub.getCall(0).args[0]).to.equal('Property foo invoked with 1!');
+        expect(stub.getCall(1).args[0]).to.equal('Property bar invoked with 2!');
+        expect(stub.getCall(2).args[0]).to.equal('Property baz invoked with 3!');
+      } finally {
+        stub.restore();
+      }
     });
   });
 });

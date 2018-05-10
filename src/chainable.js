@@ -87,8 +87,8 @@ function makeChainlink({ tokens = [], ...options }, makeChildlink) {
   // The "base" of the chainlink can be either an object or function
   // if `functionalChainlinks` is true, chainlinks will be functions
   // and will be callable (left up the the user to implement).
-  const base = !options.invocableLinks ? {} : function chainlink() {
-    properties.handleLinkInvocation({ ...properties });
+  const base = !options.invocableLinks ? {} : function chainlink(...args) {
+    properties.handleLinkInvocation({ ...properties }, ...args);
     return makeChildlink(base);
   };
 

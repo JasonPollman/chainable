@@ -125,8 +125,8 @@ const chainable = Chainable({ /* options */ });
 | -------------------- | ---------------------- | ------------ | ----------- |
 | prefix               | string\|function\|null | `null`       | A string to prepend to the chainable's `toString` result. |
 | suffix               | string\|function\|null | `null`       | A string to append to the chainable's `toString` result. |
-| sanitize             | function               | `_.identity` | A function that provides an opportunity to sanitize the `toString` result on all links are joined. |
-| sanitizeLinks        | function               | `_.identity` | A function used to sanitize each link's tokens before converting it to string. |
+| sanitize             | function               | `_.identity` | A function that provides an opportunity to sanitize the `toString` result when all links are joined. |
+| sanitizeLinks        | function               | `_.identity` | A function called on each token, providing the chance to sanitize it. |
 | separator            | string\|function       | `.`          | The "glue" to use when all of the chainable's tokens are joined. |
 | invocableLinks       | boolean                | `false`      | If `true` chainable links will be functions, not objects and can invoked. |
 | handleLinkInvocation | function               | `_.noop`     | The function that's called when a chainable is invoked, only applies when `invocableLinks` is true |
@@ -154,6 +154,37 @@ export default (host) => {
   return APIBase({ prefix: host });
 }
 ```
+
+## Invocable Chainables
+**Chainable objects can be invocable (functions) too.**    
+By default `{}` is the template used to create new chainable objects, however if you pass
+`invocableLinks` as true and supply a `handleLinkInvocation` function, you can control
+what happens when a chainable link is invoked.
+
+```js
+import Chainable from '@jasonpollman/chainable';
+
+const chainable = Chainable({
+  invocableLinks: true,
+  handleLinkInvocation: (link, value) => {
+    console.log(`Property ${link.property} invoked with ${value}!`);
+  },
+})
+
+chainable.foo(1).bar(2).baz(3);
+// Prints:
+// "Property foo invoked with 1!"
+// "Property bar invoked with 2!"
+// "Property baz invoked with 3!"
+```
+
+The `handleLinkInvocation` is called with the chainable object as the first argument. All remaining
+arguments are passed as supplied to the link call.
+
+**There is a caveat to invocable chainables:** They will always return another chainable.
+Therefore, the return value from your `handleLinkInvocation` method is ignored and cannot be awaited.
+
+You can determine the property that was invoked using the `link.property` property.
 
 ## Limitations
 **This module requires native `Proxy`. A polyfill won't work!**   
