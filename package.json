@@ -5,7 +5,11 @@
   "license": "ISC",
   "main": "index.js",
   "keywords": [
-    "chainable"
+    "chain",
+    "chainable",
+    "proxy",
+    "proxy object",
+    "utility"
   ],
   "author": {
     "name": "Jason James Pollman",
