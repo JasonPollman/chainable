@@ -3,8 +3,8 @@ import fp from 'lodash/fp';
 
 /**
  * The default options for a new chain link.
- * These will all be cast as functions, so that users can
- * provide functional options.
+ * These will all be cast as functions so that users
+ * can provide functional options if desired.
  * @type {Object}
  */
 const defaultChainlinkOptions = {
@@ -22,14 +22,13 @@ const defaultChainlinkOptions = {
 const isNotString = _.negate(_.isString);
 
 /**
- * Filters an array, removing `null` and `undefined`.
+ * Filters an array by removing all occurrences of `null` and `undefined`.
  * @function
  */
 const removeNilValues = fp.filter(fp.negate(fp.isNil));
 
 /**
- * Converts non-function values to a function
- * that returns the original input value.
+ * Converts non-function values to a function.
  * @function
  */
 const maybeCastFunction = thing => (_.isFunction(thing) ? thing : _.constant(thing));
@@ -66,8 +65,7 @@ function chainlinkToString() {
  */
 function handleChainlinkInvocation(properties) {
   return function chainlink() {
-    const options = { ...properties };
-    this.handleLinkInvocation.call(options, options);
+    this.handleLinkInvocation.call(this, { ...properties });
     return this;
   };
 }
@@ -153,11 +151,13 @@ export function chainableGenerator(settings = {}, childlinkGenerator = chainable
 /**
  * Creates a function that will create chainable objects
  * @param {Object} defaults The default options for this chainable object.
+ * @returns {function} A function that will create new chainable objects, with
+ * the supplied defaults mixed in with the options provided to the function.
  */
-export const chainableGeneratorWithDefaults = (defaults = {}) => {
+export function chainableGeneratorWithDefaults(defaults = {}) {
   const childlinkGenerator = chainableGeneratorWithDefaults(defaults);
   return settings => chainableGenerator(_.defaults(settings, defaults), childlinkGenerator);
-};
+}
 
 // Creates the default chainable creation function
 // that takes in options and returns a chainable proxy.
