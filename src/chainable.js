@@ -146,5 +146,5 @@ export default function chainableGenerator(settings = {}) {
  * the supplied defaults mixed in with the options provided to the function.
  */
 export function chainableGeneratorWithDefaults(defaults = {}) {
-  return settings => chainableGenerator(_.defaults(settings, defaults));
+  return settings => chainableGenerator(_.defaults({}, settings, defaults));
 }
